@@ -1,21 +1,21 @@
-import csv
+import pandas as pd
 
-def contar_vitorias_mandante(partidas):
-    vitorias_mandante = 0
+df = pd.read_csv("data/campeonato-brasileiro-full.csv")
 
-    for partida in partidas:
-        gols_mandante = int(partida["mandante_Placar"])
-        gols_visitante = int(partida["visitante_Placar"])
+df["vitoria_mandante"] = df["mandante_Placar"] > df["visitante_Placar"]
+df["empate"] = df["mandante_Placar"] == df["visitante_Placar"]
+df["vitoria_visitante"] = df["mandante_Placar"] < df["visitante_Placar"]
 
-        if gols_mandante > gols_visitante:
-            vitorias_mandante = vitorias_mandante + 1
+vitorias_por_time = df.groupby("mandante")["vitoria_mandante"].sum()
+empates_por_time = df.groupby("mandante")["empate"].sum()
+derrotas_por_time = df.groupby("mandante")["vitoria_visitante"].sum()
 
-    return vitorias_mandante
+time = input("Escolha o time para analisar: ")
 
-
-with open("data/campeonato-brasileiro-full.csv", encoding="utf-8") as arquivo:
-    leitor = csv.DictReader(arquivo)
-    partidas = list(leitor)
-
-resultado = contar_vitorias_mandante(partidas)
-print("Vitórias do mandante:", resultado)
+if time in vitorias_por_time.index:
+    print(f"--- {time} em casa ---")
+    print("Vitórias:", vitorias_por_time.loc[time])
+    print("Empates:", empates_por_time.loc[time])
+    print("Derrotas:", derrotas_por_time.loc[time])
+else:
+    print("Time não encontrado. Verifique o nome digitado.")
