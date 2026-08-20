@@ -1,5 +1,13 @@
-import csv
+import pandas as pd
 
-with open("data/campeonato-brasileiro-full.csv", encoding="utf-8") as arquivo:
-    leitor = csv.DictReader(arquivo)
-    partidas = list(leitor)
+df = pd.read_csv("data/campeonato-brasileiro-full.csv")
+
+df["data"] = pd.to_datetime(df["data"], format="%d/%m/%Y")
+df["ano"] = df["data"].dt.year
+
+df["temporada"] = df["ano"]
+df.loc[(df["ano"] == 2021) & (df["data"] <= "2021-02-25"), "temporada"] = 2020
+
+df["vitoria_mandante"] = df["mandante_Placar"] > df["visitante_Placar"]
+df["empate"] = df["mandante_Placar"] == df["visitante_Placar"]
+df["vitoria_visitante"] = df["mandante_Placar"] < df["visitante_Placar"]
