@@ -1,27 +1,34 @@
-def calcular_estatisticas(partidas):
-    vitorias_mandante = 0
-    empates = 0
-    vitorias_visitante = 0
-    partidas_com_erro = 0
+def calcular_resumo_mandante(df):
+    resumo = df.groupby("mandante").agg(
+        jogos=("mandante", "size"),
+        vitorias=("vitoria_mandante", "sum"),
+        empates=("empate", "sum"),
+        derrotas=("vitoria_visitante", "sum")
+    )
+    return resumo
 
-    for partida in partidas:
-        try:
-            gols_mandante = int(partida["mandante_Placar"])
-            gols_visitante = int(partida["visitante_Placar"])
-        except ValueError:
-            partidas_com_erro = partidas_com_erro + 1
-            continue
 
-        if gols_mandante > gols_visitante:
-            vitorias_mandante = vitorias_mandante + 1
-        elif gols_mandante == gols_visitante:
-            empates = empates + 1
-        else:
-            vitorias_visitante = vitorias_visitante + 1
+def calcular_resumo_visitante(df):
+    resumo = df.groupby("visitante").agg(
+        jogos=("visitante", "size"),
+        empates=("empate", "sum"),
+        vitorias=("vitoria_visitante", "sum"),
+        derrotas=("vitoria_mandante", "sum")
+    )
+    return resumo
+
+
+def calcular_dispersao_gols(df, coluna):
+    media = df[coluna].mean()
+    mediana = df[coluna].median()
+    desvio = df[coluna].std()
 
     return {
-        "vitorias_mandante": vitorias_mandante,
-        "empates": empates,
-        "vitorias_visitante": vitorias_visitante,
-        "partidas_com_erro": partidas_com_erro,
+        "media": round(media, 2),
+        "mediana": mediana,
+        "desvio_padrao": round(desvio, 2)
     }
+
+def calcular_dispersao_gols_time(df, time):
+    partidas_time = df.loc[df["mandante"] == time]
+    return calcular_dispersao_gols(partidas_time, "mandante_Placar")
