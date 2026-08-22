@@ -1,16 +1,22 @@
 import pandas as pd
+import sys
 
-df = pd.read_csv("data/campeonato-brasileiro-full.csv")
+sys.path.append("src")
 
-df["data"] = pd.to_datetime(df["data"], format="%d/%m/%Y")
-df["ano"] = df["data"].dt.year
+from partidas import df
 
-df["temporada"] = df["ano"]
+df["total_gols"] = df["mandante_Placar"] + df["visitante_Placar"]
 
-df.loc[(df["ano"] == 2021) & (df["data"] <= "2021-02-25"), "temporada"] = 2020
+jogos_over_25 = df["total_gols"] > 2.5
 
-jogos_chape_2016 = df.loc[
-    (df["temporada"] == 2016) & ((df["mandante"] == "Chapecoense") | (df["visitante"] == "Chapecoense"))
-]
+def calcular_probabilidade_over(df, linha=2.5):
+    total_gols = df["mandante_Placar"] + df["visitante_Placar"]
+    return (total_gols > linha).mean()
 
-print("Total de jogos da Chape em 2016:", len(jogos_chape_2016))
+probabilidade_geral = calcular_probabilidade_over(df)
+
+partidas_palmeiras_casa = df.loc[df["mandante"] == "Palmeiras"]
+probabilidade_palmeiras_casa = calcular_probabilidade_over(partidas_palmeiras_casa)
+
+print(f"Geral: {probabilidade_geral:.1%}")
+print(f"Palmeiras em casa: {probabilidade_palmeiras_casa:.1%}")

@@ -4,7 +4,7 @@ import sys
 sys.path.append("src")
 
 from partidas import df
-from estatisticas import calcular_resumo_mandante, calcular_resumo_visitante, calcular_dispersao_gols_time
+from estatisticas import calcular_resumo_mandante, calcular_resumo_visitante, calcular_dispersao_gols_time, calcular_tabela_over
 
 st.title("Athena — Preview do Dashboard")
 st.write("Uma prévia da Fase 10 do roadmap, usando os dados e funções que já existem no projeto.")
@@ -34,3 +34,10 @@ st.subheader("Evolução de vitórias em casa por temporada")
 partidas_time = df.loc[df["mandante"] == time_escolhido]
 vitorias_por_temporada = partidas_time.groupby("temporada")["vitoria_mandante"].sum()
 st.bar_chart(vitorias_por_temporada)
+
+st.subheader(f"Probabilidades de over — {time_escolhido} em casa")
+
+partidas_time_casa = df.loc[df["mandante"] == time_escolhido]
+tabela_over = calcular_tabela_over(partidas_time_casa)
+
+st.write(tabela_over)
