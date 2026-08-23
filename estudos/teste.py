@@ -1,16 +1,7 @@
-import sqlite3
+import sys
+sys.path.append("src")
 
-conexao = sqlite3.connect("data/athena.db")
+from banco import buscar_partidas_time
 
-resultado = conexao.execute("""
-    SELECT mandante, COUNT(*) as jogos, SUM(vitoria_mandante) as vitorias
-    FROM partidas
-    GROUP BY mandante
-    ORDER BY vitorias DESC
-    LIMIT 5
-""")
-
-for linha in resultado:
-    print(linha)
-
-conexao.close() 
+partidas_via_sql = buscar_partidas_time("Palmeiras")
+print(len(partidas_via_sql))
