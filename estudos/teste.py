@@ -1,22 +1,16 @@
-import pandas as pd
 import sys
-
 sys.path.append("src")
 
 from partidas import df
+import plotly.express as px
 
-df["total_gols"] = df["mandante_Placar"] + df["visitante_Placar"]
+distribuicao_gols = df["mandante_Placar"].value_counts().sort_index()
 
-jogos_over_25 = df["total_gols"] > 2.5
+fig = px.bar(
+    x=distribuicao_gols.index,
+    y=distribuicao_gols.values,
+    title="Distribuição de gols do mandante",
+    labels={"x": "Gols", "y": "Quantidade de jogos"}
+)
 
-def calcular_probabilidade_over(df, linha=2.5):
-    total_gols = df["mandante_Placar"] + df["visitante_Placar"]
-    return (total_gols > linha).mean()
-
-probabilidade_geral = calcular_probabilidade_over(df)
-
-partidas_palmeiras_casa = df.loc[df["mandante"] == "Palmeiras"]
-probabilidade_palmeiras_casa = calcular_probabilidade_over(partidas_palmeiras_casa)
-
-print(f"Geral: {probabilidade_geral:.1%}")
-print(f"Palmeiras em casa: {probabilidade_palmeiras_casa:.1%}")
+fig.show()
