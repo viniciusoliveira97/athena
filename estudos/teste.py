@@ -1,16 +1,16 @@
-import sys
-sys.path.append("src")
+import sqlite3
 
-from partidas import df
-import plotly.express as px
+conexao = sqlite3.connect("data/athena.db")
 
-distribuicao_gols = df["mandante_Placar"].value_counts().sort_index()
+resultado = conexao.execute("""
+    SELECT mandante, COUNT(*) as jogos, SUM(vitoria_mandante) as vitorias
+    FROM partidas
+    GROUP BY mandante
+    ORDER BY vitorias DESC
+    LIMIT 5
+""")
 
-fig = px.bar(
-    x=distribuicao_gols.index,
-    y=distribuicao_gols.values,
-    title="Distribuição de gols do mandante",
-    labels={"x": "Gols", "y": "Quantidade de jogos"}
-)
+for linha in resultado:
+    print(linha)
 
-fig.show()
+conexao.close() 
