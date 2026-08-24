@@ -1,7 +1,15 @@
-import sys
-sys.path.append("src")
+import os
+from dotenv import load_dotenv
+import requests
 
-from banco import buscar_partidas_time
+load_dotenv()
 
-partidas_via_sql = buscar_partidas_time("Palmeiras")
-print(len(partidas_via_sql))
+chave_api = os.getenv("API_FUTEBOL_KEY")
+
+headers = {
+    "Authorization": f"Bearer {chave_api}"
+}
+
+resposta = requests.get("https://api.api-futebol.com.br/v1/campeonatos/14/partidas", headers=headers)
+
+print(resposta.status_code)
