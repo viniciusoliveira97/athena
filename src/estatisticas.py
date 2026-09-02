@@ -47,3 +47,23 @@ def calcular_tabela_over(df):
         probabilidades[chave] = f"{valor:.2%}"
 
     return probabilidades
+
+def calcular_indices_forca(df, time, temporada_inicio=None, temporada_fim=None):
+    if temporada_inicio is not None:
+        df = df.loc[df["temporada"] >= temporada_inicio]
+
+    if temporada_fim is not None:
+        df = df.loc[df["temporada"] <= temporada_fim]
+
+    media_gols_liga = df["mandante_Placar"].mean()
+    media_gols_sofridos_liga = df["visitante_Placar"].mean()
+
+    partidas_time = df.loc[df["mandante"] == time]
+
+    indice_ofensivo = partidas_time["mandante_Placar"].mean() / media_gols_liga
+    indice_defensivo = partidas_time["visitante_Placar"].mean() / media_gols_sofridos_liga
+
+    return {
+        "indice_ofensivo": round(indice_ofensivo, 2),
+        "indice_defensivo": round(indice_defensivo, 2)
+    }
